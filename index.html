@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Rush</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='12' y='12' width='40' height='40' rx='6' fill='%237bf7ff'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./styles/main.css" />
+    <script>
+      window.__NEON_RUSH_BOOT_STATUS__ = "pending";
+      window.addEventListener("load", () => {
+        window.setTimeout(() => {
+          if (window.__NEON_RUSH_BOOT_STATUS__ === "ready") {
+            return;
+          }
+
+          const overlayRoot = document.getElementById("overlayRoot");
+
+          if (!overlayRoot) {
+            return;
+          }
+
+          const fileProtocolNote = location.protocol === "file:"
+            ? "<p>This page was opened directly from disk. The packaged bundle should still work, but if your browser blocks local scripts, run a local server with <code>python -m http.server 8080</code> and open <code>http://localhost:8080</code>.</p>"
+            : "";
+
+          overlayRoot.innerHTML = `
+            <section class="screen active modal-screen">
+              <div class="panel modal-panel">
+                <h2>Boot Problem</h2>
+                <p>Neon Rush did not finish loading. Open the browser console for details.</p>
+                ${fileProtocolNote}
+              </div>
+            </section>
+          `;
+        }, 1600);
+      });
+    </script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="game-frame">
+        <canvas id="gameCanvas" width="1280" height="720" aria-label="Neon Rush game canvas"></canvas>
+
+        <div id="hud" class="hud hidden" data-ui>
+          <div class="hud-top">
+            <div class="pill">
+              <span id="hudLevelName">Neon Rush</span>
+            </div>
+            <div class="pill">
+              Attempt <span id="hudAttempt">1</span>
+            </div>
+            <div class="pill">
+              Mode <span id="hudMode">Single Jump</span>
+            </div>
+          </div>
+
+          <div class="progress-shell">
+            <div class="progress-track">
+              <div id="progressFill" class="progress-fill"></div>
+              <div id="progressPulse" class="progress-pulse"></div>
+            </div>
+            <div id="progressLabel" class="progress-label">0%</div>
+          </div>
+
+          <div id="editorBanner" class="editor-banner hidden">
+            Editor: `1` Spike `2` Block `3` Jump Pad `4` Gravity Portal `5` Speed Portal `6` Moving Platform `7`
+            Checkpoint
+          </div>
+        </div>
+
+        <div id="overlayRoot" class="overlay-root" data-ui>
+          <section id="screenMenu" class="screen active">
+            <div class="title-stack">
+              <p class="eyebrow">Rhythm Platformer</p>
+              <h1>Neon Rush</h1>
+              <p class="subtitle">
+                Tight physics, instant restarts, beat-driven visuals, and modular systems built like a real project.
+              </p>
+            </div>
+
+            <div class="button-grid">
+              <button id="startGameButton" class="primary-button">Start Game</button>
+              <button id="levelSelectButton" class="secondary-button">Level Select</button>
+            </div>
+
+            <div class="settings-card">
+              <h2>Settings</h2>
+              <label class="toggle-row">
+                <span>Enable double jump mode</span>
+                <input id="doubleJumpToggle" type="checkbox" />
+              </label>
+              <label class="toggle-row">
+                <span>Show touch controls</span>
+                <input id="touchToggle" type="checkbox" />
+              </label>
+              <label class="slider-row">
+                <span>Master volume</span>
+                <input id="volumeSlider" type="range" min="0" max="100" value="32" />
+              </label>
+            </div>
+
+            <div class="hint-row">
+              <span>`Space` Jump</span>
+              <span>`P` Pause</span>
+              <span>`R` Restart</span>
+              <span>`E` Editor</span>
+            </div>
+          </section>
+
+          <section id="screenLevelSelect" class="screen">
+            <div class="panel">
+              <div class="screen-header">
+                <h2>Select Level</h2>
+                <button id="backToMenuButton" class="ghost-button">Back</button>
+              </div>
+              <div id="levelGrid" class="level-grid"></div>
+            </div>
+          </section>
+
+          <section id="screenPause" class="screen modal-screen">
+            <div class="panel modal-panel">
+              <h2>Paused</h2>
+              <p>Take a breath. The run will be right where you left it.</p>
+              <div class="button-grid compact">
+                <button id="resumeButton" class="primary-button">Resume</button>
+                <button id="restartButton" class="secondary-button">Restart</button>
+                <button id="exitLevelButton" class="ghost-button">Exit To Menu</button>
+              </div>
+            </div>
+          </section>
+
+          <section id="screenComplete" class="screen modal-screen">
+            <div class="panel modal-panel">
+              <h2>Level Complete</h2>
+              <p id="completeText">You cleared the course.</p>
+              <div class="button-grid compact">
+                <button id="nextLevelButton" class="primary-button">Next Level</button>
+                <button id="completeToMenuButton" class="secondary-button">Back To Menu</button>
+              </div>
+            </div>
+          </section>
+
+          <section id="screenLoading" class="screen modal-screen">
+            <div class="panel modal-panel loading-panel">
+              <h2>Loading</h2>
+              <p>Building the track and syncing the level...</p>
+            </div>
+          </section>
+
+          <div id="gameOverFlash" class="game-over-flash hidden">
+            <span>Crash</span>
+          </div>
+
+          <div id="toast" class="toast hidden"></div>
+        </div>
+
+        <div id="touchControls" class="touch-controls hidden" data-ui>
+          <button id="touchJump" class="touch-button jump-button">Jump</button>
+          <button id="touchPause" class="touch-button pause-button">Pause</button>
+        </div>
+
+        <div id="editorPanel" class="editor-panel hidden" data-ui>
+          <div class="editor-header">
+            <strong>Editor</strong>
+            <span id="editorSelectionLabel">Spike</span>
+          </div>
+          <div class="editor-help">
+            Click to place. Delete removes. Ctrl+S copies JSON. Editor saves only in-browser unless you export.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script defer src="./dist/game.bundle.js"></script>
+  </body>
+</html>

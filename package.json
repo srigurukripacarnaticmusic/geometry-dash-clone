@@ -1,0 +1,14 @@
+{
+  "name": "neon-rush-rhythm-platformer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A modular 2D rhythm-based platformer inspired by Geometry Dash.",
+  "scripts": {
+    "build": "node scripts/build-bundle.mjs",
+    "start": "python -m http.server 8080",
+    "validate": "node scripts/validate-levels.mjs",
+    "count-lines": "node scripts/count-lines.mjs",
+    "smoke": "node scripts/smoke-test.mjs"
+  }
+}
