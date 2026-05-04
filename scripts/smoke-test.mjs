@@ -1,12 +1,13 @@
 import { spawnSync } from "node:child_process";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "..");
 const bundledNode = "C:\\Users\\Ram\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe";
 const playwrightNodePath = "C:\\Users\\Ram\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\node_modules";
+const fileUrl = pathToFileURL(path.join(rootDir, "index.html")).href;
 
 const script = `
 const { chromium } = require("playwright");
@@ -17,13 +18,33 @@ const { chromium } = require("playwright");
   const pageErrors = [];
   page.on("console", (msg) => logs.push({ type: msg.type(), text: msg.text() }));
   page.on("pageerror", (error) => pageErrors.push(String(error)));
-  await page.goto("http://127.0.0.1:8080", { waitUntil: "networkidle" });
+  await page.goto(${JSON.stringify(fileUrl)}, { waitUntil: "load" });
+  await page.waitForTimeout(1200);
   await page.click("#levelSelectButton");
   await page.waitForTimeout(200);
   const levelSelectActive = await page.locator("#screenLevelSelect").evaluate((el) => el.classList.contains("active"));
   await page.click("#backToMenuButton");
   await page.waitForTimeout(200);
+  const tripleDisabledBeforeUnlock = await page.locator("#tripleJumpToggle").evaluate((el) => el.disabled);
   await page.check("#doubleJumpToggle");
+  await page.evaluate(() => {
+    localStorage.setItem("neon-rush-save-v1", JSON.stringify({
+      settings: {
+        jumpMode: "triple",
+        touchControls: false,
+        masterVolume: 0.32
+      },
+      progress: {
+        unlockedLevels: ["level-01", "level-02"],
+        bestPercentByLevel: { "level-01": 1 },
+        completedLevels: ["level-01"]
+      }
+    }));
+  });
+  await page.reload({ waitUntil: "load" });
+  await page.waitForTimeout(1200);
+  const tripleDisabledAfterUnlock = await page.locator("#tripleJumpToggle").evaluate((el) => el.disabled);
+  const tripleCheckedAfterUnlock = await page.locator("#tripleJumpToggle").evaluate((el) => el.checked);
   await page.click("#startGameButton");
   await page.waitForTimeout(1800);
   const hudVisible = await page.locator("#hud").evaluate((el) => !el.classList.contains("hidden"));
@@ -38,6 +59,9 @@ const { chromium } = require("playwright");
   const attempt = await page.locator("#hudAttempt").textContent();
   console.log(JSON.stringify({
     levelSelectActive,
+    tripleDisabledBeforeUnlock,
+    tripleDisabledAfterUnlock,
+    tripleCheckedAfterUnlock,
     hudVisible,
     hudMode,
     pauseVisible,

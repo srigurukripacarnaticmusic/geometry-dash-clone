@@ -22,6 +22,8 @@ export class MenuUI {
       toast: document.getElementById("toast"),
       gameOverFlash: document.getElementById("gameOverFlash"),
       doubleJumpToggle: document.getElementById("doubleJumpToggle"),
+      tripleJumpToggle: document.getElementById("tripleJumpToggle"),
+      tripleJumpHint: document.getElementById("tripleJumpHint"),
       touchToggle: document.getElementById("touchToggle"),
       volumeSlider: document.getElementById("volumeSlider"),
       levelGrid: document.getElementById("levelGrid"),
@@ -81,6 +83,14 @@ export class MenuUI {
     this.elements.doubleJumpToggle?.addEventListener("change", (event) => {
       const enabled = event.target.checked;
       this.game.saveManager.setDoubleJumpMode(enabled);
+      this.syncSettings();
+      this.game.applySettingsToActivePlayState();
+    });
+
+    this.elements.tripleJumpToggle?.addEventListener("change", (event) => {
+      const enabled = event.target.checked;
+      this.game.saveManager.setTripleJumpMode(enabled);
+      this.syncSettings();
       this.game.applySettingsToActivePlayState();
     });
 
@@ -99,7 +109,19 @@ export class MenuUI {
 
   syncSettings() {
     const { settings } = this.game.saveManager;
-    this.elements.doubleJumpToggle.checked = settings.doubleJumpMode;
+    const jumpMode = this.game.saveManager.getEffectiveJumpMode();
+    const tripleUnlocked = this.game.saveManager.isTripleJumpUnlocked();
+
+    this.elements.doubleJumpToggle.checked = jumpMode === "double" || jumpMode === "triple";
+    this.elements.tripleJumpToggle.checked = jumpMode === "triple";
+    this.elements.tripleJumpToggle.disabled = !tripleUnlocked;
+    this.elements.tripleJumpToggle
+      .closest(".toggle-row")
+      ?.classList.toggle("locked", !tripleUnlocked);
+    this.elements.tripleJumpHint.textContent = tripleUnlocked
+      ? "Unlocked. Triple jump mode can now be enabled from the start screen."
+      : "Locked. Clear Neon Run to unlock triple jump mode.";
+    this.elements.tripleJumpHint.classList.toggle("unlocked", tripleUnlocked);
     this.elements.touchToggle.checked = settings.touchControls;
     this.elements.volumeSlider.value = String(Math.round(settings.masterVolume * 100));
   }
@@ -174,7 +196,7 @@ export class MenuUI {
   updateHUD(data) {
     this.elements.hudLevelName.textContent = data.levelName;
     this.elements.hudAttempt.textContent = String(data.attempt);
-    this.elements.hudMode.textContent = data.doubleJumpMode ? "Double Jump" : "Single Jump";
+    this.elements.hudMode.textContent = data.jumpModeLabel;
     this.elements.progressFill.style.width = `${Math.round(data.progress * 100)}%`;
     this.elements.progressPulse.style.left = `${Math.round(data.progress * 100)}%`;
     this.elements.progressLabel.textContent = formatPercent(data.progress);

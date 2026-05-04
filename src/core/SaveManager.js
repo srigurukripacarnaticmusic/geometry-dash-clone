@@ -2,7 +2,7 @@ import { GAME_CONFIG } from "../config/gameConfig.js";
 
 const DEFAULT_SAVE = {
   settings: {
-    doubleJumpMode: false,
+    jumpMode: "single",
     touchControls: false,
     masterVolume: GAME_CONFIG.audio.masterVolume
   },
@@ -35,10 +35,15 @@ export class SaveManager {
   }
 
   mergeDefaults(data) {
+    const storedSettings = data?.settings ?? {};
+    const legacyJumpMode = storedSettings.jumpMode
+      ?? (storedSettings.doubleJumpMode ? "double" : "single");
+
     return {
       settings: {
-        ...DEFAULT_SAVE.settings,
-        ...(data?.settings ?? {})
+        jumpMode: this.normalizeJumpMode(legacyJumpMode),
+        touchControls: storedSettings.touchControls ?? DEFAULT_SAVE.settings.touchControls,
+        masterVolume: storedSettings.masterVolume ?? DEFAULT_SAVE.settings.masterVolume
       },
       progress: {
         ...DEFAULT_SAVE.progress,
@@ -59,13 +64,59 @@ export class SaveManager {
     return this.data.progress;
   }
 
+  normalizeJumpMode(mode, allowTriple = true) {
+    const normalized = ["single", "double", "triple"].includes(mode) ? mode : "single";
+
+    if (normalized === "triple" && !allowTriple) {
+      return "double";
+    }
+
+    return normalized;
+  }
+
+  isTripleJumpUnlocked() {
+    return this.progress.completedLevels.includes("level-01");
+  }
+
+  getEffectiveJumpMode() {
+    return this.normalizeJumpMode(this.settings.jumpMode, this.isTripleJumpUnlocked());
+  }
+
   setVolume(value) {
     this.data.settings.masterVolume = value;
     this.commit();
   }
 
   setDoubleJumpMode(enabled) {
-    this.data.settings.doubleJumpMode = enabled;
+    const currentMode = this.getEffectiveJumpMode();
+
+    if (!enabled) {
+      this.data.settings.jumpMode = "single";
+      this.commit();
+      return;
+    }
+
+    this.data.settings.jumpMode = currentMode === "triple" ? "triple" : "double";
+    this.commit();
+  }
+
+  setTripleJumpMode(enabled) {
+    const tripleUnlocked = this.isTripleJumpUnlocked();
+
+    if (enabled && tripleUnlocked) {
+      this.data.settings.jumpMode = "triple";
+      this.commit();
+      return;
+    }
+
+    if (this.getEffectiveJumpMode() === "triple") {
+      this.data.settings.jumpMode = "double";
+      this.commit();
+    }
+  }
+
+  setJumpMode(mode) {
+    this.data.settings.jumpMode = this.normalizeJumpMode(mode, this.isTripleJumpUnlocked());
     this.commit();
   }
 
@@ -84,6 +135,7 @@ export class SaveManager {
   markComplete(levelId) {
     if (!this.progress.completedLevels.includes(levelId)) {
       this.progress.completedLevels.push(levelId);
+      this.data.settings.jumpMode = this.normalizeJumpMode(this.data.settings.jumpMode, this.isTripleJumpUnlocked());
       this.commit();
     }
   }

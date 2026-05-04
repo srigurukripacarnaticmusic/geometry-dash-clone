@@ -92,7 +92,7 @@ export class PlayState extends BaseState {
     this.particles.clear();
     this.player = new Player(this.game.config, spawn);
     this.player.setBaseSpeed(this.level.baseSpeed);
-    this.player.setDoubleJumpEnabled(this.game.saveManager.settings.doubleJumpMode);
+    this.player.setJumpMode(this.game.saveManager.getEffectiveJumpMode());
 
     for (const definition of this.level.objects) {
       const entity = createEntityFromDefinition(this.level, definition);
@@ -120,7 +120,7 @@ export class PlayState extends BaseState {
   }
 
   applySettings() {
-    this.player?.setDoubleJumpEnabled(this.game.saveManager.settings.doubleJumpMode);
+    this.player?.setJumpMode(this.game.saveManager.getEffectiveJumpMode());
   }
 
   restart() {
@@ -232,6 +232,14 @@ export class PlayState extends BaseState {
         speed: 180,
         life: 0.35
       });
+    } else if (jumpResult?.type === "tripleJump") {
+      this.game.audio.playDoubleJump();
+      this.particles.spawnBurst(this.player.x + this.player.width * 0.5, this.player.y + this.player.height * 0.5, {
+        color: "#ff9fd4",
+        count: 18,
+        speed: 210,
+        life: 0.4
+      });
     }
 
     for (const pad of this.jumpPads) {
@@ -305,7 +313,11 @@ export class PlayState extends BaseState {
       levelName: this.level.name,
       attempt: this.attempt,
       progress: this.progress,
-      doubleJumpMode: this.game.saveManager.settings.doubleJumpMode,
+      jumpModeLabel: this.game.saveManager.getEffectiveJumpMode() === "triple"
+        ? "Triple Jump"
+        : this.game.saveManager.getEffectiveJumpMode() === "double"
+          ? "Double Jump"
+          : "Single Jump",
       beat: this.beatPulse
     });
   }

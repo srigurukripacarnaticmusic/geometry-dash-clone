@@ -26,7 +26,8 @@ export class Player extends Entity {
     this.hitWall = false;
     this.rotation = 0;
     this.alive = true;
-    this.allowDoubleJump = false;
+    this.jumpMode = "single";
+    this.maxJumpCount = 1;
     this.trail = [];
     this.trailSpawnTimer = 0;
     this.groundEntity = null;
@@ -34,8 +35,9 @@ export class Player extends Entity {
     this.isCompleting = false;
   }
 
-  setDoubleJumpEnabled(enabled) {
-    this.allowDoubleJump = enabled;
+  setJumpMode(mode) {
+    this.jumpMode = mode;
+    this.maxJumpCount = mode === "triple" ? 3 : mode === "double" ? 2 : 1;
   }
 
   setBaseSpeed(speed) {
@@ -77,7 +79,7 @@ export class Player extends Entity {
       return true;
     }
 
-    if (this.allowDoubleJump && this.jumpCount < 2) {
+    if (this.jumpCount < this.maxJumpCount) {
       return true;
     }
 
@@ -96,8 +98,15 @@ export class Player extends Entity {
     this.jumpBufferTimer = 0;
     this.jumpCount += 1;
 
+    if (!isAirJump) {
+      return {
+        type: "jump",
+        source
+      };
+    }
+
     return {
-      type: isAirJump ? "doubleJump" : "jump",
+      type: this.jumpCount >= 3 ? "tripleJump" : "doubleJump",
       source
     };
   }
@@ -108,7 +117,7 @@ export class Player extends Entity {
     this.grounded = false;
     this.coyoteTimer = 0;
     this.jumpBufferTimer = 0;
-    this.jumpCount = Math.min(this.jumpCount + 1, this.allowDoubleJump ? 1 : 1);
+    this.jumpCount = Math.min(Math.max(this.jumpCount, 1), this.maxJumpCount);
   }
 
   flipGravity() {

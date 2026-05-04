@@ -770,7 +770,7 @@
       const { GAME_CONFIG } = __require__("src/config/gameConfig.js");
       const DEFAULT_SAVE = {
         settings: {
-          doubleJumpMode: false,
+          jumpMode: "single",
           touchControls: false,
           masterVolume: GAME_CONFIG.audio.masterVolume
         },
@@ -803,10 +803,15 @@
         }
       
         mergeDefaults(data) {
+          const storedSettings = data?.settings ?? {};
+          const legacyJumpMode = storedSettings.jumpMode
+            ?? (storedSettings.doubleJumpMode ? "double" : "single");
+      
           return {
             settings: {
-              ...DEFAULT_SAVE.settings,
-              ...(data?.settings ?? {})
+              jumpMode: this.normalizeJumpMode(legacyJumpMode),
+              touchControls: storedSettings.touchControls ?? DEFAULT_SAVE.settings.touchControls,
+              masterVolume: storedSettings.masterVolume ?? DEFAULT_SAVE.settings.masterVolume
             },
             progress: {
               ...DEFAULT_SAVE.progress,
@@ -827,13 +832,59 @@
           return this.data.progress;
         }
       
+        normalizeJumpMode(mode, allowTriple = true) {
+          const normalized = ["single", "double", "triple"].includes(mode) ? mode : "single";
+      
+          if (normalized === "triple" && !allowTriple) {
+            return "double";
+          }
+      
+          return normalized;
+        }
+      
+        isTripleJumpUnlocked() {
+          return this.progress.completedLevels.includes("level-01");
+        }
+      
+        getEffectiveJumpMode() {
+          return this.normalizeJumpMode(this.settings.jumpMode, this.isTripleJumpUnlocked());
+        }
+      
         setVolume(value) {
           this.data.settings.masterVolume = value;
           this.commit();
         }
       
         setDoubleJumpMode(enabled) {
-          this.data.settings.doubleJumpMode = enabled;
+          const currentMode = this.getEffectiveJumpMode();
+      
+          if (!enabled) {
+            this.data.settings.jumpMode = "single";
+            this.commit();
+            return;
+          }
+      
+          this.data.settings.jumpMode = currentMode === "triple" ? "triple" : "double";
+          this.commit();
+        }
+      
+        setTripleJumpMode(enabled) {
+          const tripleUnlocked = this.isTripleJumpUnlocked();
+      
+          if (enabled && tripleUnlocked) {
+            this.data.settings.jumpMode = "triple";
+            this.commit();
+            return;
+          }
+      
+          if (this.getEffectiveJumpMode() === "triple") {
+            this.data.settings.jumpMode = "double";
+            this.commit();
+          }
+        }
+      
+        setJumpMode(mode) {
+          this.data.settings.jumpMode = this.normalizeJumpMode(mode, this.isTripleJumpUnlocked());
           this.commit();
         }
       
@@ -852,6 +903,7 @@
         markComplete(levelId) {
           if (!this.progress.completedLevels.includes(levelId)) {
             this.progress.completedLevels.push(levelId);
+            this.data.settings.jumpMode = this.normalizeJumpMode(this.data.settings.jumpMode, this.isTripleJumpUnlocked());
             this.commit();
           }
         }
@@ -1409,7 +1461,8 @@
           this.hitWall = false;
           this.rotation = 0;
           this.alive = true;
-          this.allowDoubleJump = false;
+          this.jumpMode = "single";
+          this.maxJumpCount = 1;
           this.trail = [];
           this.trailSpawnTimer = 0;
           this.groundEntity = null;
@@ -1417,8 +1470,9 @@
           this.isCompleting = false;
         }
       
-        setDoubleJumpEnabled(enabled) {
-          this.allowDoubleJump = enabled;
+        setJumpMode(mode) {
+          this.jumpMode = mode;
+          this.maxJumpCount = mode === "triple" ? 3 : mode === "double" ? 2 : 1;
         }
       
         setBaseSpeed(speed) {
@@ -1460,7 +1514,7 @@
             return true;
           }
       
-          if (this.allowDoubleJump && this.jumpCount < 2) {
+          if (this.jumpCount < this.maxJumpCount) {
             return true;
           }
       
@@ -1479,8 +1533,15 @@
           this.jumpBufferTimer = 0;
           this.jumpCount += 1;
       
+          if (!isAirJump) {
+            return {
+              type: "jump",
+              source
+            };
+          }
+      
           return {
-            type: isAirJump ? "doubleJump" : "jump",
+            type: this.jumpCount >= 3 ? "tripleJump" : "doubleJump",
             source
           };
         }
@@ -1491,7 +1552,7 @@
           this.grounded = false;
           this.coyoteTimer = 0;
           this.jumpBufferTimer = 0;
-          this.jumpCount = Math.min(this.jumpCount + 1, this.allowDoubleJump ? 1 : 1);
+          this.jumpCount = Math.min(Math.max(this.jumpCount, 1), this.maxJumpCount);
         }
       
         flipGravity() {
@@ -4064,7 +4125,7 @@
           this.particles.clear();
           this.player = new Player(this.game.config, spawn);
           this.player.setBaseSpeed(this.level.baseSpeed);
-          this.player.setDoubleJumpEnabled(this.game.saveManager.settings.doubleJumpMode);
+          this.player.setJumpMode(this.game.saveManager.getEffectiveJumpMode());
       
           for (const definition of this.level.objects) {
             const entity = createEntityFromDefinition(this.level, definition);
@@ -4092,7 +4153,7 @@
         }
       
         applySettings() {
-          this.player?.setDoubleJumpEnabled(this.game.saveManager.settings.doubleJumpMode);
+          this.player?.setJumpMode(this.game.saveManager.getEffectiveJumpMode());
         }
       
         restart() {
@@ -4204,6 +4265,14 @@
               speed: 180,
               life: 0.35
             });
+          } else if (jumpResult?.type === "tripleJump") {
+            this.game.audio.playDoubleJump();
+            this.particles.spawnBurst(this.player.x + this.player.width * 0.5, this.player.y + this.player.height * 0.5, {
+              color: "#ff9fd4",
+              count: 18,
+              speed: 210,
+              life: 0.4
+            });
           }
       
           for (const pad of this.jumpPads) {
@@ -4277,7 +4346,11 @@
             levelName: this.level.name,
             attempt: this.attempt,
             progress: this.progress,
-            doubleJumpMode: this.game.saveManager.settings.doubleJumpMode,
+            jumpModeLabel: this.game.saveManager.getEffectiveJumpMode() === "triple"
+              ? "Triple Jump"
+              : this.game.saveManager.getEffectiveJumpMode() === "double"
+                ? "Double Jump"
+                : "Single Jump",
             beat: this.beatPulse
           });
         }
@@ -4398,6 +4471,8 @@
             toast: document.getElementById("toast"),
             gameOverFlash: document.getElementById("gameOverFlash"),
             doubleJumpToggle: document.getElementById("doubleJumpToggle"),
+            tripleJumpToggle: document.getElementById("tripleJumpToggle"),
+            tripleJumpHint: document.getElementById("tripleJumpHint"),
             touchToggle: document.getElementById("touchToggle"),
             volumeSlider: document.getElementById("volumeSlider"),
             levelGrid: document.getElementById("levelGrid"),
@@ -4457,6 +4532,14 @@
           this.elements.doubleJumpToggle?.addEventListener("change", (event) => {
             const enabled = event.target.checked;
             this.game.saveManager.setDoubleJumpMode(enabled);
+            this.syncSettings();
+            this.game.applySettingsToActivePlayState();
+          });
+      
+          this.elements.tripleJumpToggle?.addEventListener("change", (event) => {
+            const enabled = event.target.checked;
+            this.game.saveManager.setTripleJumpMode(enabled);
+            this.syncSettings();
             this.game.applySettingsToActivePlayState();
           });
       
@@ -4475,7 +4558,19 @@
       
         syncSettings() {
           const { settings } = this.game.saveManager;
-          this.elements.doubleJumpToggle.checked = settings.doubleJumpMode;
+          const jumpMode = this.game.saveManager.getEffectiveJumpMode();
+          const tripleUnlocked = this.game.saveManager.isTripleJumpUnlocked();
+      
+          this.elements.doubleJumpToggle.checked = jumpMode === "double" || jumpMode === "triple";
+          this.elements.tripleJumpToggle.checked = jumpMode === "triple";
+          this.elements.tripleJumpToggle.disabled = !tripleUnlocked;
+          this.elements.tripleJumpToggle
+            .closest(".toggle-row")
+            ?.classList.toggle("locked", !tripleUnlocked);
+          this.elements.tripleJumpHint.textContent = tripleUnlocked
+            ? "Unlocked. Triple jump mode can now be enabled from the start screen."
+            : "Locked. Clear Neon Run to unlock triple jump mode.";
+          this.elements.tripleJumpHint.classList.toggle("unlocked", tripleUnlocked);
           this.elements.touchToggle.checked = settings.touchControls;
           this.elements.volumeSlider.value = String(Math.round(settings.masterVolume * 100));
         }
@@ -4550,7 +4645,7 @@
         updateHUD(data) {
           this.elements.hudLevelName.textContent = data.levelName;
           this.elements.hudAttempt.textContent = String(data.attempt);
-          this.elements.hudMode.textContent = data.doubleJumpMode ? "Double Jump" : "Single Jump";
+          this.elements.hudMode.textContent = data.jumpModeLabel;
           this.elements.progressFill.style.width = `${Math.round(data.progress * 100)}%`;
           this.elements.progressPulse.style.left = `${Math.round(data.progress * 100)}%`;
           this.elements.progressLabel.textContent = formatPercent(data.progress);

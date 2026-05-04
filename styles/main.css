@@ -302,6 +302,29 @@ button {
   flex-shrink: 0;
 }
 
+.setting-note {
+  margin: -2px 0 8px;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.setting-note.unlocked {
+  color: var(--success);
+}
+
+.toggle-row.locked {
+  opacity: 0.62;
+}
+
+.toggle-row.locked span {
+  color: var(--text-soft);
+}
+
+.toggle-row input:disabled {
+  cursor: not-allowed;
+}
+
 .hint-row {
   display: flex;
   gap: 18px;
