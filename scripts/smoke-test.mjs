@@ -20,16 +20,27 @@ const { chromium } = require("playwright");
   page.on("pageerror", (error) => pageErrors.push(String(error)));
   await page.goto(${JSON.stringify(fileUrl)}, { waitUntil: "load" });
   await page.waitForTimeout(1200);
+  const initialJumpCap = await page.locator("#jumpCountSlider").evaluate((el) => Number(el.max));
+  const initialJumpCountValue = await page.locator("#jumpCountValue").textContent();
+  await page.click("#startGameButton");
+  await page.waitForFunction(() => {
+    const hud = document.querySelector("#hud");
+    return hud && !hud.classList.contains("hidden");
+  });
+  const levelOneHudMode = await page.locator("#hudMode").textContent();
+  await page.keyboard.press("KeyP");
+  await page.waitForTimeout(200);
+  await page.click("#exitLevelButton");
+  await page.waitForTimeout(300);
   await page.click("#levelSelectButton");
   await page.waitForTimeout(200);
   const levelSelectActive = await page.locator("#screenLevelSelect").evaluate((el) => el.classList.contains("active"));
   await page.click("#backToMenuButton");
   await page.waitForTimeout(200);
-  const jumpCapBeforeUnlock = await page.locator("#jumpCountSlider").evaluate((el) => Number(el.max));
   await page.evaluate(() => {
     localStorage.setItem("neon-rush-save-v1", JSON.stringify({
       settings: {
-        jumpCount: 4,
+        jumpCount: 1,
         touchControls: false,
         masterVolume: 0.32
       },
@@ -43,10 +54,6 @@ const { chromium } = require("playwright");
   await page.reload({ waitUntil: "load" });
   await page.waitForTimeout(1200);
   const jumpCapAfterUnlock = await page.locator("#jumpCountSlider").evaluate((el) => Number(el.max));
-  await page.locator("#jumpCountSlider").evaluate((el) => {
-    el.value = "4";
-    el.dispatchEvent(new Event("input", { bubbles: true }));
-  });
   const jumpCountValue = await page.locator("#jumpCountValue").textContent();
   await page.click("#levelSelectButton");
   await page.waitForTimeout(200);
@@ -66,8 +73,10 @@ const { chromium } = require("playwright");
   await page.waitForTimeout(900);
   const attempt = await page.locator("#hudAttempt").textContent();
   const summary = {
+    initialJumpCap,
+    initialJumpCountValue,
+    levelOneHudMode,
     levelSelectActive,
-    jumpCapBeforeUnlock,
     jumpCapAfterUnlock,
     jumpCountValue,
     hudVisible,
@@ -82,8 +91,16 @@ const { chromium } = require("playwright");
     throw new Error("Level select screen did not open.");
   }
 
-  if (jumpCapBeforeUnlock !== 2) {
-    throw new Error(\`Expected starting jump cap 2, got \${jumpCapBeforeUnlock}.\`);
+  if (initialJumpCap !== 2) {
+    throw new Error(\`Expected initial jump cap 2, got \${initialJumpCap}.\`);
+  }
+
+  if (initialJumpCountValue !== "2 Jumps") {
+    throw new Error(\`Expected a fresh save to default to 2 Jumps, got \${initialJumpCountValue}.\`);
+  }
+
+  if (levelOneHudMode !== "2 Jumps") {
+    throw new Error(\`Expected Level 1 HUD to show 2 Jumps, got \${levelOneHudMode}.\`);
   }
 
   if (jumpCapAfterUnlock !== 4) {
@@ -91,7 +108,7 @@ const { chromium } = require("playwright");
   }
 
   if (jumpCountValue !== "4 Jumps") {
-    throw new Error(\`Expected jump selector label to be 4 Jumps, got \${jumpCountValue}.\`);
+    throw new Error(\`Expected migrated save to upgrade to 4 Jumps, got \${jumpCountValue}.\`);
   }
 
   if (!hudVisible || hudMode !== "4 Jumps") {

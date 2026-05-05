@@ -15,7 +15,7 @@ The web stack is the best fit for this project because it gives us:
 ## Features
 
 - Continuous auto-run platformer movement
-- Configurable jump count that scales with level progression
+- Configurable jump count that defaults to the highest unlocked value and scales with level progression
 - Jump pads, gravity portals, speed portals, spikes, moving platforms, checkpoints
 - Fixed-timestep physics and accurate collision handling
 - Instant restart flow with screen shake and particles

@@ -109,7 +109,7 @@ export class MenuUI {
     this.elements.jumpCountSlider.max = String(unlockedJumpCap);
     this.elements.jumpCountSlider.value = String(selectedJumpCount);
     this.elements.jumpCountValue.textContent = this.game.saveManager.getJumpCountLabel();
-    this.elements.jumpCountHint.textContent = `Unlocked jump cap: ${unlockedJumpCap}. Each level can use up to its level number plus one jumps, so Level 3 supports 4 jumps.`;
+    this.elements.jumpCountHint.textContent = `Unlocked jump cap: ${unlockedJumpCap}. New saves follow the highest unlocked jump count by default, and each level uses its level number plus one jumps, so Level 3 supports 4 jumps.`;
     this.elements.touchToggle.checked = settings.touchControls;
     this.elements.volumeSlider.value = String(Math.round(settings.masterVolume * 100));
   }

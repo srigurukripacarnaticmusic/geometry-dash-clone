@@ -8,10 +8,12 @@ const LEGACY_JUMP_COUNTS = {
   double: 2,
   triple: 3
 };
+const DEFAULT_UNLOCKED_JUMP_COUNT = Math.max(1, (ORDERED_LEVELS[0]?.order ?? 0) + 1);
 
 const DEFAULT_SAVE = {
   settings: {
-    jumpCount: 1,
+    jumpCount: DEFAULT_UNLOCKED_JUMP_COUNT,
+    jumpCountCustomized: false,
     touchControls: false,
     masterVolume: GAME_CONFIG.audio.masterVolume
   },
@@ -45,18 +47,21 @@ export class SaveManager {
 
   mergeDefaults(data) {
     const storedSettings = data?.settings ?? {};
-    const jumpCount = this.resolveStoredJumpCount(storedSettings, data?.progress);
+    const progress = {
+      ...DEFAULT_SAVE.progress,
+      ...(data?.progress ?? {})
+    };
+    const jumpCountCustomized = storedSettings.jumpCountCustomized === true;
+    const jumpCount = this.resolveStoredJumpCount(storedSettings, progress, jumpCountCustomized);
 
     return {
       settings: {
         jumpCount,
+        jumpCountCustomized,
         touchControls: storedSettings.touchControls ?? DEFAULT_SAVE.settings.touchControls,
         masterVolume: storedSettings.masterVolume ?? DEFAULT_SAVE.settings.masterVolume
       },
-      progress: {
-        ...DEFAULT_SAVE.progress,
-        ...(data?.progress ?? {})
-      }
+      progress
     };
   }
 
@@ -72,17 +77,23 @@ export class SaveManager {
     return this.data.progress;
   }
 
-  resolveStoredJumpCount(storedSettings, progress = this.progress) {
+  resolveStoredJumpCount(storedSettings, progress = this.progress, jumpCountCustomized = this.settings?.jumpCountCustomized === true) {
+    const unlockedJumpCap = this.getUnlockedJumpCap(progress);
+
+    if (!jumpCountCustomized) {
+      return unlockedJumpCap;
+    }
+
     const parsedJumpCount = Number.parseInt(storedSettings.jumpCount, 10);
 
     if (Number.isFinite(parsedJumpCount)) {
-      return this.normalizeJumpCount(parsedJumpCount, this.getUnlockedJumpCap(progress));
+      return this.normalizeJumpCount(parsedJumpCount, unlockedJumpCap);
     }
 
     const legacyMode = storedSettings.jumpMode
       ?? (storedSettings.doubleJumpMode ? "double" : "single");
     const legacyJumpCount = LEGACY_JUMP_COUNTS[legacyMode] ?? DEFAULT_SAVE.settings.jumpCount;
-    return this.normalizeJumpCount(legacyJumpCount, this.getUnlockedJumpCap(progress));
+    return this.normalizeJumpCount(legacyJumpCount, unlockedJumpCap);
   }
 
   getHighestUnlockedLevelOrder(progress = this.progress) {
@@ -130,7 +141,9 @@ export class SaveManager {
   }
 
   setJumpCount(jumpCount) {
-    this.data.settings.jumpCount = this.normalizeJumpCount(jumpCount);
+    const normalizedJumpCount = this.normalizeJumpCount(jumpCount);
+    this.data.settings.jumpCount = normalizedJumpCount;
+    this.data.settings.jumpCountCustomized = normalizedJumpCount < this.getUnlockedJumpCap();
     this.commit();
   }
 
@@ -141,7 +154,15 @@ export class SaveManager {
 
   unlockLevel(levelId) {
     if (!this.progress.unlockedLevels.includes(levelId)) {
+      const previousJumpCap = this.getUnlockedJumpCap();
       this.progress.unlockedLevels.push(levelId);
+      const nextJumpCap = this.getUnlockedJumpCap();
+
+      if (!this.settings.jumpCountCustomized || this.settings.jumpCount >= previousJumpCap) {
+        this.data.settings.jumpCount = nextJumpCap;
+        this.data.settings.jumpCountCustomized = false;
+      }
+
       this.commit();
     }
   }
