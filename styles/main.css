@@ -313,6 +313,25 @@ button {
   flex-shrink: 0;
 }
 
+.slider-control {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex: 1;
+}
+
+.slider-control input {
+  width: min(240px, 100%);
+}
+
+.slider-value {
+  min-width: 82px;
+  text-align: right;
+  color: var(--text-main);
+  font-weight: 700;
+}
+
 .setting-note {
   margin: -2px 0 8px;
   color: var(--text-soft);
@@ -395,6 +414,7 @@ button {
   display: flex;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
   font-size: 0.92rem;
   color: var(--text-soft);
   margin: 12px 0 16px;
@@ -549,6 +569,16 @@ button {
   .settings-card,
   .panel {
     padding: 18px;
+  }
+
+  .slider-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .slider-control {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .progress-shell {

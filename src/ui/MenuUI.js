@@ -21,9 +21,9 @@ export class MenuUI {
       touchControls: document.getElementById("touchControls"),
       toast: document.getElementById("toast"),
       gameOverFlash: document.getElementById("gameOverFlash"),
-      doubleJumpToggle: document.getElementById("doubleJumpToggle"),
-      tripleJumpToggle: document.getElementById("tripleJumpToggle"),
-      tripleJumpHint: document.getElementById("tripleJumpHint"),
+      jumpCountSlider: document.getElementById("jumpCountSlider"),
+      jumpCountValue: document.getElementById("jumpCountValue"),
+      jumpCountHint: document.getElementById("jumpCountHint"),
       touchToggle: document.getElementById("touchToggle"),
       volumeSlider: document.getElementById("volumeSlider"),
       levelGrid: document.getElementById("levelGrid"),
@@ -80,16 +80,9 @@ export class MenuUI {
       this.game.openMenu();
     });
 
-    this.elements.doubleJumpToggle?.addEventListener("change", (event) => {
-      const enabled = event.target.checked;
-      this.game.saveManager.setDoubleJumpMode(enabled);
-      this.syncSettings();
-      this.game.applySettingsToActivePlayState();
-    });
-
-    this.elements.tripleJumpToggle?.addEventListener("change", (event) => {
-      const enabled = event.target.checked;
-      this.game.saveManager.setTripleJumpMode(enabled);
+    this.elements.jumpCountSlider?.addEventListener("input", (event) => {
+      const jumpCount = Number.parseInt(event.target.value, 10);
+      this.game.saveManager.setJumpCount(jumpCount);
       this.syncSettings();
       this.game.applySettingsToActivePlayState();
     });
@@ -109,19 +102,14 @@ export class MenuUI {
 
   syncSettings() {
     const { settings } = this.game.saveManager;
-    const jumpMode = this.game.saveManager.getEffectiveJumpMode();
-    const tripleUnlocked = this.game.saveManager.isTripleJumpUnlocked();
+    const unlockedJumpCap = this.game.saveManager.getUnlockedJumpCap();
+    const selectedJumpCount = this.game.saveManager.getEffectiveJumpCount();
 
-    this.elements.doubleJumpToggle.checked = jumpMode === "double" || jumpMode === "triple";
-    this.elements.tripleJumpToggle.checked = jumpMode === "triple";
-    this.elements.tripleJumpToggle.disabled = !tripleUnlocked;
-    this.elements.tripleJumpToggle
-      .closest(".toggle-row")
-      ?.classList.toggle("locked", !tripleUnlocked);
-    this.elements.tripleJumpHint.textContent = tripleUnlocked
-      ? "Unlocked. Triple jump mode can now be enabled from the start screen."
-      : "Locked. Clear Neon Run to unlock triple jump mode.";
-    this.elements.tripleJumpHint.classList.toggle("unlocked", tripleUnlocked);
+    this.elements.jumpCountSlider.min = "1";
+    this.elements.jumpCountSlider.max = String(unlockedJumpCap);
+    this.elements.jumpCountSlider.value = String(selectedJumpCount);
+    this.elements.jumpCountValue.textContent = this.game.saveManager.getJumpCountLabel();
+    this.elements.jumpCountHint.textContent = `Unlocked jump cap: ${unlockedJumpCap}. Each level can use up to its level number plus one jumps, so Level 3 supports 4 jumps.`;
     this.elements.touchToggle.checked = settings.touchControls;
     this.elements.volumeSlider.value = String(Math.round(settings.masterVolume * 100));
   }
@@ -252,6 +240,7 @@ export class MenuUI {
         <p>${level.description}</p>
         <div class="level-stats">
           <span>Best ${Math.round(best * 100)}%</span>
+          <span>${level.order + 1} jumps max</span>
           <span>${completed ? "Cleared" : unlocked ? "Unlocked" : "Locked"}</span>
         </div>
         <button ${unlocked ? "" : "disabled"}>${unlocked ? "Play" : "Locked"}</button>

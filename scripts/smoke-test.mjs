@@ -25,28 +25,36 @@ const { chromium } = require("playwright");
   const levelSelectActive = await page.locator("#screenLevelSelect").evaluate((el) => el.classList.contains("active"));
   await page.click("#backToMenuButton");
   await page.waitForTimeout(200);
-  const tripleDisabledBeforeUnlock = await page.locator("#tripleJumpToggle").evaluate((el) => el.disabled);
-  await page.check("#doubleJumpToggle");
+  const jumpCapBeforeUnlock = await page.locator("#jumpCountSlider").evaluate((el) => Number(el.max));
   await page.evaluate(() => {
     localStorage.setItem("neon-rush-save-v1", JSON.stringify({
       settings: {
-        jumpMode: "triple",
+        jumpCount: 4,
         touchControls: false,
         masterVolume: 0.32
       },
       progress: {
-        unlockedLevels: ["level-01", "level-02"],
-        bestPercentByLevel: { "level-01": 1 },
-        completedLevels: ["level-01"]
+        unlockedLevels: ["level-01", "level-02", "level-03"],
+        bestPercentByLevel: { "level-01": 1, "level-02": 0.86 },
+        completedLevels: ["level-01", "level-02"]
       }
     }));
   });
   await page.reload({ waitUntil: "load" });
   await page.waitForTimeout(1200);
-  const tripleDisabledAfterUnlock = await page.locator("#tripleJumpToggle").evaluate((el) => el.disabled);
-  const tripleCheckedAfterUnlock = await page.locator("#tripleJumpToggle").evaluate((el) => el.checked);
-  await page.click("#startGameButton");
-  await page.waitForTimeout(1800);
+  const jumpCapAfterUnlock = await page.locator("#jumpCountSlider").evaluate((el) => Number(el.max));
+  await page.locator("#jumpCountSlider").evaluate((el) => {
+    el.value = "4";
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  const jumpCountValue = await page.locator("#jumpCountValue").textContent();
+  await page.click("#levelSelectButton");
+  await page.waitForTimeout(200);
+  await page.locator("#levelGrid .level-card").nth(2).locator("button").click();
+  await page.waitForFunction(() => {
+    const hud = document.querySelector("#hud");
+    return hud && !hud.classList.contains("hidden");
+  });
   const hudVisible = await page.locator("#hud").evaluate((el) => !el.classList.contains("hidden"));
   const hudMode = await page.locator("#hudMode").textContent();
   await page.keyboard.press("KeyP");
@@ -57,18 +65,52 @@ const { chromium } = require("playwright");
   await page.keyboard.press("KeyR");
   await page.waitForTimeout(900);
   const attempt = await page.locator("#hudAttempt").textContent();
-  console.log(JSON.stringify({
+  const summary = {
     levelSelectActive,
-    tripleDisabledBeforeUnlock,
-    tripleDisabledAfterUnlock,
-    tripleCheckedAfterUnlock,
+    jumpCapBeforeUnlock,
+    jumpCapAfterUnlock,
+    jumpCountValue,
     hudVisible,
     hudMode,
     pauseVisible,
     attempt,
     pageErrors,
     consoleErrors: logs.filter((entry) => entry.type === "error")
-  }, null, 2));
+  };
+
+  if (!levelSelectActive) {
+    throw new Error("Level select screen did not open.");
+  }
+
+  if (jumpCapBeforeUnlock !== 2) {
+    throw new Error(\`Expected starting jump cap 2, got \${jumpCapBeforeUnlock}.\`);
+  }
+
+  if (jumpCapAfterUnlock !== 4) {
+    throw new Error(\`Expected unlocked jump cap 4, got \${jumpCapAfterUnlock}.\`);
+  }
+
+  if (jumpCountValue !== "4 Jumps") {
+    throw new Error(\`Expected jump selector label to be 4 Jumps, got \${jumpCountValue}.\`);
+  }
+
+  if (!hudVisible || hudMode !== "4 Jumps") {
+    throw new Error(\`Expected Level 3 HUD to show 4 Jumps, got \${hudMode}.\`);
+  }
+
+  if (!pauseVisible) {
+    throw new Error("Pause screen did not open.");
+  }
+
+  if (Number(attempt) < 2) {
+    throw new Error(\`Expected restart attempt counter to increase, got \${attempt}.\`);
+  }
+
+  if (pageErrors.length || summary.consoleErrors.length) {
+    throw new Error("Browser errors were reported during the smoke test.");
+  }
+
+  console.log(JSON.stringify(summary, null, 2));
   await browser.close();
 })();
 `;

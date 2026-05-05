@@ -86,16 +86,15 @@
 
             <div class="settings-card">
               <h2>Settings</h2>
-              <label class="toggle-row">
-                <span>Enable double jump mode</span>
-                <input id="doubleJumpToggle" type="checkbox" />
+              <label class="slider-row">
+                <span>Jump count</span>
+                <div class="slider-control">
+                  <input id="jumpCountSlider" type="range" min="1" max="2" value="1" />
+                  <output id="jumpCountValue" class="slider-value">1 Jump</output>
+                </div>
               </label>
-              <label class="toggle-row">
-                <span>Enable triple jump mode</span>
-                <input id="tripleJumpToggle" type="checkbox" />
-              </label>
-              <p id="tripleJumpHint" class="setting-note">
-                Locked. Clear Neon Run to unlock triple jump mode.
+              <p id="jumpCountHint" class="setting-note">
+                Level 1 allows 2 jumps, Level 2 allows 3, and Level 3 allows 4.
               </p>
               <label class="toggle-row">
                 <span>Show touch controls</span>

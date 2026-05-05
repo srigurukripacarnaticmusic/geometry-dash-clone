@@ -1,8 +1,17 @@
 import { GAME_CONFIG } from "../config/gameConfig.js";
+import { LEVEL_CATALOG } from "../level/levelCatalog.js";
+
+const ORDERED_LEVELS = [...LEVEL_CATALOG].sort((first, second) => first.order - second.order);
+const LEVEL_META_BY_ID = new Map(ORDERED_LEVELS.map((level) => [level.id, level]));
+const LEGACY_JUMP_COUNTS = {
+  single: 1,
+  double: 2,
+  triple: 3
+};
 
 const DEFAULT_SAVE = {
   settings: {
-    jumpMode: "single",
+    jumpCount: 1,
     touchControls: false,
     masterVolume: GAME_CONFIG.audio.masterVolume
   },
@@ -36,12 +45,11 @@ export class SaveManager {
 
   mergeDefaults(data) {
     const storedSettings = data?.settings ?? {};
-    const legacyJumpMode = storedSettings.jumpMode
-      ?? (storedSettings.doubleJumpMode ? "double" : "single");
+    const jumpCount = this.resolveStoredJumpCount(storedSettings, data?.progress);
 
     return {
       settings: {
-        jumpMode: this.normalizeJumpMode(legacyJumpMode),
+        jumpCount,
         touchControls: storedSettings.touchControls ?? DEFAULT_SAVE.settings.touchControls,
         masterVolume: storedSettings.masterVolume ?? DEFAULT_SAVE.settings.masterVolume
       },
@@ -64,22 +72,56 @@ export class SaveManager {
     return this.data.progress;
   }
 
-  normalizeJumpMode(mode, allowTriple = true) {
-    const normalized = ["single", "double", "triple"].includes(mode) ? mode : "single";
+  resolveStoredJumpCount(storedSettings, progress = this.progress) {
+    const parsedJumpCount = Number.parseInt(storedSettings.jumpCount, 10);
 
-    if (normalized === "triple" && !allowTriple) {
-      return "double";
+    if (Number.isFinite(parsedJumpCount)) {
+      return this.normalizeJumpCount(parsedJumpCount, this.getUnlockedJumpCap(progress));
     }
 
-    return normalized;
+    const legacyMode = storedSettings.jumpMode
+      ?? (storedSettings.doubleJumpMode ? "double" : "single");
+    const legacyJumpCount = LEGACY_JUMP_COUNTS[legacyMode] ?? DEFAULT_SAVE.settings.jumpCount;
+    return this.normalizeJumpCount(legacyJumpCount, this.getUnlockedJumpCap(progress));
   }
 
-  isTripleJumpUnlocked() {
-    return this.progress.completedLevels.includes("level-01");
+  getHighestUnlockedLevelOrder(progress = this.progress) {
+    const unlockedLevels = new Set(progress?.unlockedLevels ?? []);
+    let highestOrder = ORDERED_LEVELS[0]?.order ?? 0;
+
+    for (const level of ORDERED_LEVELS) {
+      if (unlockedLevels.has(level.id)) {
+        highestOrder = Math.max(highestOrder, level.order);
+      }
+    }
+
+    return highestOrder;
   }
 
-  getEffectiveJumpMode() {
-    return this.normalizeJumpMode(this.settings.jumpMode, this.isTripleJumpUnlocked());
+  getUnlockedJumpCap(progress = this.progress) {
+    return Math.max(1, this.getHighestUnlockedLevelOrder(progress) + 1);
+  }
+
+  getLevelJumpCap(levelId) {
+    const level = LEVEL_META_BY_ID.get(levelId);
+    return level ? Math.max(1, level.order + 1) : this.getUnlockedJumpCap();
+  }
+
+  normalizeJumpCount(jumpCount, maxJumpCount = this.getUnlockedJumpCap()) {
+    const parsedCount = Number.parseInt(jumpCount, 10);
+    const safeMax = Math.max(1, Number.parseInt(maxJumpCount, 10) || 1);
+    const safeCount = Number.isFinite(parsedCount) ? parsedCount : DEFAULT_SAVE.settings.jumpCount;
+    return Math.max(1, Math.min(safeMax, safeCount));
+  }
+
+  getEffectiveJumpCount(levelId = null) {
+    const maxJumpCount = levelId ? this.getLevelJumpCap(levelId) : this.getUnlockedJumpCap();
+    return this.normalizeJumpCount(this.settings.jumpCount, maxJumpCount);
+  }
+
+  getJumpCountLabel(levelId = null) {
+    const jumpCount = this.getEffectiveJumpCount(levelId);
+    return `${jumpCount} ${jumpCount === 1 ? "Jump" : "Jumps"}`;
   }
 
   setVolume(value) {
@@ -87,36 +129,8 @@ export class SaveManager {
     this.commit();
   }
 
-  setDoubleJumpMode(enabled) {
-    const currentMode = this.getEffectiveJumpMode();
-
-    if (!enabled) {
-      this.data.settings.jumpMode = "single";
-      this.commit();
-      return;
-    }
-
-    this.data.settings.jumpMode = currentMode === "triple" ? "triple" : "double";
-    this.commit();
-  }
-
-  setTripleJumpMode(enabled) {
-    const tripleUnlocked = this.isTripleJumpUnlocked();
-
-    if (enabled && tripleUnlocked) {
-      this.data.settings.jumpMode = "triple";
-      this.commit();
-      return;
-    }
-
-    if (this.getEffectiveJumpMode() === "triple") {
-      this.data.settings.jumpMode = "double";
-      this.commit();
-    }
-  }
-
-  setJumpMode(mode) {
-    this.data.settings.jumpMode = this.normalizeJumpMode(mode, this.isTripleJumpUnlocked());
+  setJumpCount(jumpCount) {
+    this.data.settings.jumpCount = this.normalizeJumpCount(jumpCount);
     this.commit();
   }
 
@@ -135,7 +149,7 @@ export class SaveManager {
   markComplete(levelId) {
     if (!this.progress.completedLevels.includes(levelId)) {
       this.progress.completedLevels.push(levelId);
-      this.data.settings.jumpMode = this.normalizeJumpMode(this.data.settings.jumpMode, this.isTripleJumpUnlocked());
+      this.data.settings.jumpCount = this.normalizeJumpCount(this.data.settings.jumpCount);
       this.commit();
     }
   }

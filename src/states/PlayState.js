@@ -92,7 +92,7 @@ export class PlayState extends BaseState {
     this.particles.clear();
     this.player = new Player(this.game.config, spawn);
     this.player.setBaseSpeed(this.level.baseSpeed);
-    this.player.setJumpMode(this.game.saveManager.getEffectiveJumpMode());
+    this.player.setJumpCount(this.game.saveManager.getEffectiveJumpCount(this.levelId));
 
     for (const definition of this.level.objects) {
       const entity = createEntityFromDefinition(this.level, definition);
@@ -120,7 +120,7 @@ export class PlayState extends BaseState {
   }
 
   applySettings() {
-    this.player?.setJumpMode(this.game.saveManager.getEffectiveJumpMode());
+    this.player?.setJumpCount(this.game.saveManager.getEffectiveJumpCount(this.levelId));
   }
 
   restart() {
@@ -224,21 +224,19 @@ export class PlayState extends BaseState {
           speed: 140
         }
       );
-    } else if (jumpResult?.type === "doubleJump") {
+    } else if (jumpResult?.type === "airJump") {
       this.game.audio.playDoubleJump();
+      const airJumpCount = jumpResult.jumpCount ?? 2;
+      const burstColor = airJumpCount === 2
+        ? "#ffe57a"
+        : airJumpCount === 3
+          ? "#ff9fd4"
+          : "#89ffb0";
       this.particles.spawnBurst(this.player.x + this.player.width * 0.5, this.player.y + this.player.height * 0.5, {
-        color: "#ffe57a",
-        count: 14,
-        speed: 180,
-        life: 0.35
-      });
-    } else if (jumpResult?.type === "tripleJump") {
-      this.game.audio.playDoubleJump();
-      this.particles.spawnBurst(this.player.x + this.player.width * 0.5, this.player.y + this.player.height * 0.5, {
-        color: "#ff9fd4",
-        count: 18,
-        speed: 210,
-        life: 0.4
+        color: burstColor,
+        count: 10 + airJumpCount * 2,
+        speed: 150 + airJumpCount * 12,
+        life: 0.28 + airJumpCount * 0.03
       });
     }
 
@@ -313,11 +311,7 @@ export class PlayState extends BaseState {
       levelName: this.level.name,
       attempt: this.attempt,
       progress: this.progress,
-      jumpModeLabel: this.game.saveManager.getEffectiveJumpMode() === "triple"
-        ? "Triple Jump"
-        : this.game.saveManager.getEffectiveJumpMode() === "double"
-          ? "Double Jump"
-          : "Single Jump",
+      jumpModeLabel: this.game.saveManager.getJumpCountLabel(this.levelId),
       beat: this.beatPulse
     });
   }

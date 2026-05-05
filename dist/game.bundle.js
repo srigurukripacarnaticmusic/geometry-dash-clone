@@ -768,9 +768,18 @@
     },
     "src/core/SaveManager.js": (exports, __require__) => {
       const { GAME_CONFIG } = __require__("src/config/gameConfig.js");
+      const { LEVEL_CATALOG } = __require__("src/level/levelCatalog.js");
+      const ORDERED_LEVELS = [...LEVEL_CATALOG].sort((first, second) => first.order - second.order);
+      const LEVEL_META_BY_ID = new Map(ORDERED_LEVELS.map((level) => [level.id, level]));
+      const LEGACY_JUMP_COUNTS = {
+        single: 1,
+        double: 2,
+        triple: 3
+      };
+      
       const DEFAULT_SAVE = {
         settings: {
-          jumpMode: "single",
+          jumpCount: 1,
           touchControls: false,
           masterVolume: GAME_CONFIG.audio.masterVolume
         },
@@ -804,12 +813,11 @@
       
         mergeDefaults(data) {
           const storedSettings = data?.settings ?? {};
-          const legacyJumpMode = storedSettings.jumpMode
-            ?? (storedSettings.doubleJumpMode ? "double" : "single");
+          const jumpCount = this.resolveStoredJumpCount(storedSettings, data?.progress);
       
           return {
             settings: {
-              jumpMode: this.normalizeJumpMode(legacyJumpMode),
+              jumpCount,
               touchControls: storedSettings.touchControls ?? DEFAULT_SAVE.settings.touchControls,
               masterVolume: storedSettings.masterVolume ?? DEFAULT_SAVE.settings.masterVolume
             },
@@ -832,22 +840,56 @@
           return this.data.progress;
         }
       
-        normalizeJumpMode(mode, allowTriple = true) {
-          const normalized = ["single", "double", "triple"].includes(mode) ? mode : "single";
+        resolveStoredJumpCount(storedSettings, progress = this.progress) {
+          const parsedJumpCount = Number.parseInt(storedSettings.jumpCount, 10);
       
-          if (normalized === "triple" && !allowTriple) {
-            return "double";
+          if (Number.isFinite(parsedJumpCount)) {
+            return this.normalizeJumpCount(parsedJumpCount, this.getUnlockedJumpCap(progress));
           }
       
-          return normalized;
+          const legacyMode = storedSettings.jumpMode
+            ?? (storedSettings.doubleJumpMode ? "double" : "single");
+          const legacyJumpCount = LEGACY_JUMP_COUNTS[legacyMode] ?? DEFAULT_SAVE.settings.jumpCount;
+          return this.normalizeJumpCount(legacyJumpCount, this.getUnlockedJumpCap(progress));
         }
       
-        isTripleJumpUnlocked() {
-          return this.progress.completedLevels.includes("level-01");
+        getHighestUnlockedLevelOrder(progress = this.progress) {
+          const unlockedLevels = new Set(progress?.unlockedLevels ?? []);
+          let highestOrder = ORDERED_LEVELS[0]?.order ?? 0;
+      
+          for (const level of ORDERED_LEVELS) {
+            if (unlockedLevels.has(level.id)) {
+              highestOrder = Math.max(highestOrder, level.order);
+            }
+          }
+      
+          return highestOrder;
         }
       
-        getEffectiveJumpMode() {
-          return this.normalizeJumpMode(this.settings.jumpMode, this.isTripleJumpUnlocked());
+        getUnlockedJumpCap(progress = this.progress) {
+          return Math.max(1, this.getHighestUnlockedLevelOrder(progress) + 1);
+        }
+      
+        getLevelJumpCap(levelId) {
+          const level = LEVEL_META_BY_ID.get(levelId);
+          return level ? Math.max(1, level.order + 1) : this.getUnlockedJumpCap();
+        }
+      
+        normalizeJumpCount(jumpCount, maxJumpCount = this.getUnlockedJumpCap()) {
+          const parsedCount = Number.parseInt(jumpCount, 10);
+          const safeMax = Math.max(1, Number.parseInt(maxJumpCount, 10) || 1);
+          const safeCount = Number.isFinite(parsedCount) ? parsedCount : DEFAULT_SAVE.settings.jumpCount;
+          return Math.max(1, Math.min(safeMax, safeCount));
+        }
+      
+        getEffectiveJumpCount(levelId = null) {
+          const maxJumpCount = levelId ? this.getLevelJumpCap(levelId) : this.getUnlockedJumpCap();
+          return this.normalizeJumpCount(this.settings.jumpCount, maxJumpCount);
+        }
+      
+        getJumpCountLabel(levelId = null) {
+          const jumpCount = this.getEffectiveJumpCount(levelId);
+          return `${jumpCount} ${jumpCount === 1 ? "Jump" : "Jumps"}`;
         }
       
         setVolume(value) {
@@ -855,36 +897,8 @@
           this.commit();
         }
       
-        setDoubleJumpMode(enabled) {
-          const currentMode = this.getEffectiveJumpMode();
-      
-          if (!enabled) {
-            this.data.settings.jumpMode = "single";
-            this.commit();
-            return;
-          }
-      
-          this.data.settings.jumpMode = currentMode === "triple" ? "triple" : "double";
-          this.commit();
-        }
-      
-        setTripleJumpMode(enabled) {
-          const tripleUnlocked = this.isTripleJumpUnlocked();
-      
-          if (enabled && tripleUnlocked) {
-            this.data.settings.jumpMode = "triple";
-            this.commit();
-            return;
-          }
-      
-          if (this.getEffectiveJumpMode() === "triple") {
-            this.data.settings.jumpMode = "double";
-            this.commit();
-          }
-        }
-      
-        setJumpMode(mode) {
-          this.data.settings.jumpMode = this.normalizeJumpMode(mode, this.isTripleJumpUnlocked());
+        setJumpCount(jumpCount) {
+          this.data.settings.jumpCount = this.normalizeJumpCount(jumpCount);
           this.commit();
         }
       
@@ -903,7 +917,7 @@
         markComplete(levelId) {
           if (!this.progress.completedLevels.includes(levelId)) {
             this.progress.completedLevels.push(levelId);
-            this.data.settings.jumpMode = this.normalizeJumpMode(this.data.settings.jumpMode, this.isTripleJumpUnlocked());
+            this.data.settings.jumpCount = this.normalizeJumpCount(this.data.settings.jumpCount);
             this.commit();
           }
         }
@@ -1461,7 +1475,7 @@
           this.hitWall = false;
           this.rotation = 0;
           this.alive = true;
-          this.jumpMode = "single";
+          this.jumpCountLimit = 1;
           this.maxJumpCount = 1;
           this.trail = [];
           this.trailSpawnTimer = 0;
@@ -1470,9 +1484,9 @@
           this.isCompleting = false;
         }
       
-        setJumpMode(mode) {
-          this.jumpMode = mode;
-          this.maxJumpCount = mode === "triple" ? 3 : mode === "double" ? 2 : 1;
+        setJumpCount(count) {
+          this.jumpCountLimit = Math.max(1, count);
+          this.maxJumpCount = this.jumpCountLimit;
         }
       
         setBaseSpeed(speed) {
@@ -1541,7 +1555,8 @@
           }
       
           return {
-            type: this.jumpCount >= 3 ? "tripleJump" : "doubleJump",
+            type: "airJump",
+            jumpCount: this.jumpCount,
             source
           };
         }
@@ -14462,7 +14477,7 @@
           this.particles.clear();
           this.player = new Player(this.game.config, spawn);
           this.player.setBaseSpeed(this.level.baseSpeed);
-          this.player.setJumpMode(this.game.saveManager.getEffectiveJumpMode());
+          this.player.setJumpCount(this.game.saveManager.getEffectiveJumpCount(this.levelId));
       
           for (const definition of this.level.objects) {
             const entity = createEntityFromDefinition(this.level, definition);
@@ -14490,7 +14505,7 @@
         }
       
         applySettings() {
-          this.player?.setJumpMode(this.game.saveManager.getEffectiveJumpMode());
+          this.player?.setJumpCount(this.game.saveManager.getEffectiveJumpCount(this.levelId));
         }
       
         restart() {
@@ -14594,21 +14609,19 @@
                 speed: 140
               }
             );
-          } else if (jumpResult?.type === "doubleJump") {
+          } else if (jumpResult?.type === "airJump") {
             this.game.audio.playDoubleJump();
+            const airJumpCount = jumpResult.jumpCount ?? 2;
+            const burstColor = airJumpCount === 2
+              ? "#ffe57a"
+              : airJumpCount === 3
+                ? "#ff9fd4"
+                : "#89ffb0";
             this.particles.spawnBurst(this.player.x + this.player.width * 0.5, this.player.y + this.player.height * 0.5, {
-              color: "#ffe57a",
-              count: 14,
-              speed: 180,
-              life: 0.35
-            });
-          } else if (jumpResult?.type === "tripleJump") {
-            this.game.audio.playDoubleJump();
-            this.particles.spawnBurst(this.player.x + this.player.width * 0.5, this.player.y + this.player.height * 0.5, {
-              color: "#ff9fd4",
-              count: 18,
-              speed: 210,
-              life: 0.4
+              color: burstColor,
+              count: 10 + airJumpCount * 2,
+              speed: 150 + airJumpCount * 12,
+              life: 0.28 + airJumpCount * 0.03
             });
           }
       
@@ -14683,11 +14696,7 @@
             levelName: this.level.name,
             attempt: this.attempt,
             progress: this.progress,
-            jumpModeLabel: this.game.saveManager.getEffectiveJumpMode() === "triple"
-              ? "Triple Jump"
-              : this.game.saveManager.getEffectiveJumpMode() === "double"
-                ? "Double Jump"
-                : "Single Jump",
+            jumpModeLabel: this.game.saveManager.getJumpCountLabel(this.levelId),
             beat: this.beatPulse
           });
         }
@@ -14807,9 +14816,9 @@
             touchControls: document.getElementById("touchControls"),
             toast: document.getElementById("toast"),
             gameOverFlash: document.getElementById("gameOverFlash"),
-            doubleJumpToggle: document.getElementById("doubleJumpToggle"),
-            tripleJumpToggle: document.getElementById("tripleJumpToggle"),
-            tripleJumpHint: document.getElementById("tripleJumpHint"),
+            jumpCountSlider: document.getElementById("jumpCountSlider"),
+            jumpCountValue: document.getElementById("jumpCountValue"),
+            jumpCountHint: document.getElementById("jumpCountHint"),
             touchToggle: document.getElementById("touchToggle"),
             volumeSlider: document.getElementById("volumeSlider"),
             levelGrid: document.getElementById("levelGrid"),
@@ -14866,16 +14875,9 @@
             this.game.openMenu();
           });
       
-          this.elements.doubleJumpToggle?.addEventListener("change", (event) => {
-            const enabled = event.target.checked;
-            this.game.saveManager.setDoubleJumpMode(enabled);
-            this.syncSettings();
-            this.game.applySettingsToActivePlayState();
-          });
-      
-          this.elements.tripleJumpToggle?.addEventListener("change", (event) => {
-            const enabled = event.target.checked;
-            this.game.saveManager.setTripleJumpMode(enabled);
+          this.elements.jumpCountSlider?.addEventListener("input", (event) => {
+            const jumpCount = Number.parseInt(event.target.value, 10);
+            this.game.saveManager.setJumpCount(jumpCount);
             this.syncSettings();
             this.game.applySettingsToActivePlayState();
           });
@@ -14895,19 +14897,14 @@
       
         syncSettings() {
           const { settings } = this.game.saveManager;
-          const jumpMode = this.game.saveManager.getEffectiveJumpMode();
-          const tripleUnlocked = this.game.saveManager.isTripleJumpUnlocked();
+          const unlockedJumpCap = this.game.saveManager.getUnlockedJumpCap();
+          const selectedJumpCount = this.game.saveManager.getEffectiveJumpCount();
       
-          this.elements.doubleJumpToggle.checked = jumpMode === "double" || jumpMode === "triple";
-          this.elements.tripleJumpToggle.checked = jumpMode === "triple";
-          this.elements.tripleJumpToggle.disabled = !tripleUnlocked;
-          this.elements.tripleJumpToggle
-            .closest(".toggle-row")
-            ?.classList.toggle("locked", !tripleUnlocked);
-          this.elements.tripleJumpHint.textContent = tripleUnlocked
-            ? "Unlocked. Triple jump mode can now be enabled from the start screen."
-            : "Locked. Clear Neon Run to unlock triple jump mode.";
-          this.elements.tripleJumpHint.classList.toggle("unlocked", tripleUnlocked);
+          this.elements.jumpCountSlider.min = "1";
+          this.elements.jumpCountSlider.max = String(unlockedJumpCap);
+          this.elements.jumpCountSlider.value = String(selectedJumpCount);
+          this.elements.jumpCountValue.textContent = this.game.saveManager.getJumpCountLabel();
+          this.elements.jumpCountHint.textContent = `Unlocked jump cap: ${unlockedJumpCap}. Each level can use up to its level number plus one jumps, so Level 3 supports 4 jumps.`;
           this.elements.touchToggle.checked = settings.touchControls;
           this.elements.volumeSlider.value = String(Math.round(settings.masterVolume * 100));
         }
@@ -15038,6 +15035,7 @@
               <p>${level.description}</p>
               <div class="level-stats">
                 <span>Best ${Math.round(best * 100)}%</span>
+                <span>${level.order + 1} jumps max</span>
                 <span>${completed ? "Cleared" : unlocked ? "Unlocked" : "Locked"}</span>
               </div>
               <button ${unlocked ? "" : "disabled"}>${unlocked ? "Play" : "Locked"}</button>

@@ -15,7 +15,7 @@ The web stack is the best fit for this project because it gives us:
 ## Features
 
 - Continuous auto-run platformer movement
-- Jump and optional double-jump mode
+- Configurable jump count that scales with level progression
 - Jump pads, gravity portals, speed portals, spikes, moving platforms, checkpoints
 - Fixed-timestep physics and accurate collision handling
 - Instant restart flow with screen shake and particles
@@ -64,7 +64,7 @@ The web stack is the best fit for this project because it gives us:
 
 1. Start the first level from the menu.
 2. Press jump on the first spike section to confirm ground jump timing.
-3. Turn on double-jump mode in settings and verify the second air jump.
+3. Raise the jump-count slider and verify the extra air jumps match the selected value.
 4. Reach a yellow jump pad and confirm the boosted bounce and rotation.
 5. Reach a cyan gravity portal and confirm the player flips to the ceiling.
 6. Reach a green speed portal and confirm run speed increases immediately.

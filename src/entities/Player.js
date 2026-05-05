@@ -26,7 +26,7 @@ export class Player extends Entity {
     this.hitWall = false;
     this.rotation = 0;
     this.alive = true;
-    this.jumpMode = "single";
+    this.jumpCountLimit = 1;
     this.maxJumpCount = 1;
     this.trail = [];
     this.trailSpawnTimer = 0;
@@ -35,9 +35,9 @@ export class Player extends Entity {
     this.isCompleting = false;
   }
 
-  setJumpMode(mode) {
-    this.jumpMode = mode;
-    this.maxJumpCount = mode === "triple" ? 3 : mode === "double" ? 2 : 1;
+  setJumpCount(count) {
+    this.jumpCountLimit = Math.max(1, count);
+    this.maxJumpCount = this.jumpCountLimit;
   }
 
   setBaseSpeed(speed) {
@@ -106,7 +106,8 @@ export class Player extends Entity {
     }
 
     return {
-      type: this.jumpCount >= 3 ? "tripleJump" : "doubleJump",
+      type: "airJump",
+      jumpCount: this.jumpCount,
       source
     };
   }
