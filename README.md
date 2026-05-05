@@ -75,7 +75,7 @@ The web stack is the best fit for this project because it gives us:
 
 ## Testing Utilities
 
-- `npm run validate` checks level JSON parsing and basic schema assumptions.
+- `npm run validate` checks level JSON parsing, schema assumptions, and spawn/opening safety.
 - `npm run count-lines` prints the total line count for source, JSON, HTML, and CSS files.
 - `npm run smoke` launches a headless browser flow and verifies menu, level select, start, pause, and restart behavior.
 

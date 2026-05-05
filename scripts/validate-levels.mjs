@@ -1,3 +1,5 @@
+import { GAME_CONFIG } from "../src/config/gameConfig.js";
+import { rectIntersectsSpike } from "../src/physics/Collision.js";
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,6 +16,15 @@ if (files.length === 0) {
 }
 
 let failures = 0;
+
+function getWorldRect(level, object) {
+  return {
+    x: object.x * level.tileSize,
+    y: object.y * level.tileSize,
+    width: (object.width ?? 1) * level.tileSize,
+    height: (object.height ?? 1) * level.tileSize
+  };
+}
 
 for (const file of files) {
   const fullPath = path.join(levelsDir, file);
@@ -47,6 +58,43 @@ for (const file of files) {
   if (badRow) {
     failures += 1;
     console.error(`${file}: one or more tile rows do not match width ${level.width}`);
+    continue;
+  }
+
+  const playerSpawnRect = {
+    x: level.player.spawnX * level.tileSize,
+    y: level.player.spawnY * level.tileSize,
+    width: GAME_CONFIG.player.width,
+    height: GAME_CONFIG.player.height
+  };
+  const collidingSpawnSpike = level.objects.find((object) => (
+    object.type === "spike" &&
+    rectIntersectsSpike(playerSpawnRect, {
+      ...getWorldRect(level, object),
+      direction: object.direction ?? "up"
+    })
+  ));
+
+  if (collidingSpawnSpike) {
+    failures += 1;
+    console.error(
+      `${file}: player spawn intersects spike at (${collidingSpawnSpike.x}, ${collidingSpawnSpike.y})`
+    );
+    continue;
+  }
+
+  const unsafeOpeningSpikes = level.objects.filter((object) => (
+    object.type === "spike" &&
+    (object.direction ?? "up") === "up" &&
+    object.x < level.player.spawnX + 5 &&
+    object.y >= Math.floor(level.player.spawnY) - 1
+  ));
+
+  if (unsafeOpeningSpikes.length > 0) {
+    failures += 1;
+    console.error(
+      `${file}: opening floor spikes are too close to spawn -> ${unsafeOpeningSpikes.map((object) => `(${object.x}, ${object.y})`).join(", ")}`
+    );
     continue;
   }
 

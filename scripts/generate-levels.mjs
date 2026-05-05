@@ -62,6 +62,14 @@ function spikeRow(objects, startX, count, y, direction = "up", gap = 2, color = 
   }
 }
 
+function openingSpikeStart(offset, relativeStartX, minimumStartX = 9) {
+  if (offset !== 0) {
+    return offset + relativeStartX;
+  }
+
+  return Math.max(offset + relativeStartX, minimumStartX);
+}
+
 function ceilingSpikeRun(objects, startX, count, y = 1, gap = 2, color = "#ff9fd4") {
   spikeRow(objects, startX, count, y, "down", gap, color);
 }
@@ -188,7 +196,7 @@ function moduleGravityLift(rows, objects, offset, options = {}) {
   addPlatform(rows, 7, offset + 34, offset + 62);
   addGap(rows, offset + 48, offset + 52);
 
-  spikeRow(objects, offset + 9, options.startSpikeCount ?? 4, 12, "up", options.startSpikeGap ?? 2);
+  spikeRow(objects, openingSpikeStart(offset, 9), options.startSpikeCount ?? 4, 12, "up", options.startSpikeGap ?? 2);
   addJumpPad(objects, offset + 18, options.padPower ?? 1.3);
   spikeRow(objects, offset + 23, options.midSpikeCount ?? 3, 12, "up", options.midSpikeGap ?? 2);
   addGravityPortal(objects, offset + 31, -1, 9);
@@ -207,7 +215,7 @@ function moduleSwitchback(rows, objects, offset, options = {}) {
   addPlatform(rows, 8, offset + 24, offset + 49);
   addGap(rows, offset + 52, offset + 56);
 
-  spikeRow(objects, offset + 2, options.startCount ?? 4, 12, "up", 2);
+  spikeRow(objects, openingSpikeStart(offset, 2), options.startCount ?? 4, 12, "up", 2);
 
   if (options.checkpoint !== false) {
     addCheckpoint(objects, offset + 14);
@@ -239,7 +247,7 @@ function moduleVelocityNest(rows, objects, offset, options = {}) {
   addPlatform(rows, 8, offset + 50, offset + 70);
   addGap(rows, offset + 60, offset + 64);
 
-  spikeRow(objects, offset + 0, options.startCount ?? 5, 12, "up", 2);
+  spikeRow(objects, openingSpikeStart(offset, 0), options.startCount ?? 5, 12, "up", 2);
   addSpeedPortal(objects, offset + 12, options.speedMultiplier ?? 1.55, 9);
   addBlock(objects, offset + 20, 10, 2, 1, options.blockColorA ?? "#355374");
   addBlock(objects, offset + 23, 9, 2, 1, options.blockColorB ?? "#355374");
@@ -268,7 +276,7 @@ function moduleOrbitalClimb(rows, objects, offset, options = {}) {
   addGap(rows, offset + 22, offset + 26);
   addGap(rows, offset + 76, offset + 80);
 
-  spikeRow(objects, offset + 4, options.introSpikeCount ?? 3, 12, "up", 2);
+  spikeRow(objects, openingSpikeStart(offset, 4), options.introSpikeCount ?? 3, 12, "up", 2);
   addMovingPlatform(objects, offset + 22, 12, {
     axis: "y",
     distance: options.platformDistance ?? 3,
@@ -299,7 +307,7 @@ function moduleApexGauntlet(rows, objects, offset, options = {}) {
   addGap(rows, offset + 52, offset + 56);
   addGap(rows, offset + 82, offset + 86);
 
-  spikeRow(objects, offset + 0, options.introSpikeCount ?? 4, 12, "up", 2);
+  spikeRow(objects, openingSpikeStart(offset, 0), options.introSpikeCount ?? 4, 12, "up", 2);
   addSpeedPortal(objects, offset + 8, options.speedMultiplier ?? 1.65, 9);
   addJumpPad(objects, offset + 12, options.padPower ?? 1.3);
   spikeRow(objects, offset + 24, options.midSpikeCount ?? 4, 12, "up", 2);

@@ -3710,7 +3710,7 @@ export const LEVEL_DATA = {
     "objects": [
       {
         "type": "spike",
-        "x": 4,
+        "x": 9,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -3719,7 +3719,7 @@ export const LEVEL_DATA = {
       },
       {
         "type": "spike",
-        "x": 6,
+        "x": 11,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -3728,7 +3728,7 @@ export const LEVEL_DATA = {
       },
       {
         "type": "spike",
-        "x": 8,
+        "x": 13,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -3737,7 +3737,7 @@ export const LEVEL_DATA = {
       },
       {
         "type": "spike",
-        "x": 10,
+        "x": 15,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -6209,7 +6209,7 @@ export const LEVEL_DATA = {
     "objects": [
       {
         "type": "spike",
-        "x": 4,
+        "x": 9,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -6218,7 +6218,7 @@ export const LEVEL_DATA = {
       },
       {
         "type": "spike",
-        "x": 6,
+        "x": 11,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -6227,7 +6227,7 @@ export const LEVEL_DATA = {
       },
       {
         "type": "spike",
-        "x": 8,
+        "x": 13,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -6236,7 +6236,7 @@ export const LEVEL_DATA = {
       },
       {
         "type": "spike",
-        "x": 10,
+        "x": 15,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -6245,7 +6245,7 @@ export const LEVEL_DATA = {
       },
       {
         "type": "spike",
-        "x": 12,
+        "x": 17,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -9320,7 +9320,7 @@ export const LEVEL_DATA = {
     "objects": [
       {
         "type": "spike",
-        "x": 4,
+        "x": 9,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -9329,7 +9329,7 @@ export const LEVEL_DATA = {
       },
       {
         "type": "spike",
-        "x": 6,
+        "x": 11,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -9338,7 +9338,7 @@ export const LEVEL_DATA = {
       },
       {
         "type": "spike",
-        "x": 8,
+        "x": 13,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -9347,7 +9347,7 @@ export const LEVEL_DATA = {
       },
       {
         "type": "spike",
-        "x": 10,
+        "x": 15,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -9356,7 +9356,7 @@ export const LEVEL_DATA = {
       },
       {
         "type": "spike",
-        "x": 12,
+        "x": 17,
         "y": 12,
         "width": 1,
         "height": 1,
@@ -9365,7 +9365,7 @@ export const LEVEL_DATA = {
       },
       {
         "type": "spike",
-        "x": 14,
+        "x": 19,
         "y": 12,
         "width": 1,
         "height": 1,
