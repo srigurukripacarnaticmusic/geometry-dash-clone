@@ -1,0 +1,1375 @@
+{
+  "id": "level-08",
+  "name": "Sky Splitter",
+  "description": "This level blends vertical gaps and ceiling pressure into a long sequence with almost no safe slack.",
+  "width": 478,
+  "height": 15,
+  "tileSize": 48,
+  "baseSpeed": 254,
+  "finishX": 473,
+  "songId": "gravityDrive",
+  "meta": {
+    "author": "Codex",
+    "difficulty": "Insane"
+  },
+  "player": {
+    "spawnX": 4,
+    "spawnY": 12.25
+  },
+  "colors": {
+    "skyTop": "#34194d",
+    "skyBottom": "#08101a",
+    "glow": "#9fe0ff",
+    "accent": "#89ffb0",
+    "tile": "#523880"
+  },
+  "tiles": {
+    "solids": [
+      "##############################################################################################################################################################################################################################################################################################################################################################################################################################################################################################",
+      "..............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................",
+      "..............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................",
+      "..............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................",
+      "..............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................",
+      "..............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................",
+      "......................................#####################...................................................................................................................................................................................................................................................................................................................................................................................................................................",
+      "....................................................................................................................................................................................................................###################.......................................................................................................................................................................................................................................................",
+      "................................................................................................................................##########################..............................#################...................................................................#################...........................................................#####################...................................................##########################....................................",
+      "......................................................................#####################.......................................................................................................................................................#################...............................................#######################.....................................................................................................................................................",
+      "..............###############.................................................................................................................................................................................................................................................................................................................................................................................................................................................................",
+      "..............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................",
+      "..............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................",
+      "######################.....#################################################.....###########################################################################.....###########################.....#############################.....#########################.....#################################################################################################.....#####################################################################################.....#############################",
+      "######################.....#################################################.....###########################################################################.....###########################.....#############################.....#########################.....#################################################################################################.....#####################################################################################.....#############################"
+    ]
+  },
+  "objects": [
+    {
+      "type": "spike",
+      "x": 4,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 6,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 8,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 10,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 12,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "movingPlatform",
+      "x": 22,
+      "y": 12,
+      "width": 2,
+      "height": 0.5,
+      "axis": "y",
+      "distance": 3,
+      "speed": 88,
+      "color": "#9fe0ff"
+    },
+    {
+      "type": "jumpPad",
+      "x": 32,
+      "y": 12.75,
+      "width": 1,
+      "height": 0.25,
+      "power": 1.28,
+      "color": "#ffe57a"
+    },
+    {
+      "type": "spike",
+      "x": 35,
+      "y": 5,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 38,
+      "y": 5,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "portal",
+      "portalType": "gravity",
+      "x": 40,
+      "y": 7,
+      "width": 1,
+      "height": 3,
+      "targetGravity": -1
+    },
+    {
+      "type": "spike",
+      "x": 46,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 48,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 50,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 52,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 54,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 56,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 58,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 60,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 62,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "portal",
+      "portalType": "speed",
+      "x": 56,
+      "y": 6,
+      "width": 1,
+      "height": 3,
+      "speedMultiplier": 1.64
+    },
+    {
+      "type": "portal",
+      "portalType": "gravity",
+      "x": 64,
+      "y": 6,
+      "width": 1,
+      "height": 3,
+      "targetGravity": 1
+    },
+    {
+      "type": "spike",
+      "x": 72,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 74,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 76,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 78,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 80,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 82,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "checkpoint",
+      "x": 86,
+      "y": 10.5,
+      "width": 0.4,
+      "height": 2,
+      "color": "#ffe57a"
+    },
+    {
+      "type": "jumpPad",
+      "x": 92,
+      "y": 12.75,
+      "width": 1,
+      "height": 0.25,
+      "power": 1.36,
+      "color": "#ffe57a"
+    },
+    {
+      "type": "spike",
+      "x": 106,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 108,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 110,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 112,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 114,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 116,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "checkpoint",
+      "x": 118,
+      "y": 10.5,
+      "width": 0.4,
+      "height": 2,
+      "color": "#ffe57a"
+    },
+    {
+      "type": "jumpPad",
+      "x": 124,
+      "y": 12.75,
+      "width": 1,
+      "height": 0.25,
+      "power": 1.2,
+      "color": "#ffe57a"
+    },
+    {
+      "type": "spike",
+      "x": 132,
+      "y": 7,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 134,
+      "y": 7,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 136,
+      "y": 7,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "portal",
+      "portalType": "gravity",
+      "x": 144,
+      "y": 9,
+      "width": 1,
+      "height": 3,
+      "targetGravity": -1
+    },
+    {
+      "type": "spike",
+      "x": 150,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 153,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 156,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 159,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 162,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 165,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 168,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "portal",
+      "portalType": "gravity",
+      "x": 158,
+      "y": 6,
+      "width": 1,
+      "height": 3,
+      "targetGravity": 1
+    },
+    {
+      "type": "movingPlatform",
+      "x": 156,
+      "y": 12,
+      "width": 2,
+      "height": 0.5,
+      "axis": "x",
+      "distance": 3,
+      "speed": 70,
+      "color": "#89ffb0"
+    },
+    {
+      "type": "spike",
+      "x": 170,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 172,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 174,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 176,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 178,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 180,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "portal",
+      "portalType": "speed",
+      "x": 178,
+      "y": 9,
+      "width": 1,
+      "height": 3,
+      "speedMultiplier": 1.65
+    },
+    {
+      "type": "jumpPad",
+      "x": 182,
+      "y": 12.75,
+      "width": 1,
+      "height": 0.25,
+      "power": 1.3,
+      "color": "#ffe57a"
+    },
+    {
+      "type": "spike",
+      "x": 194,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 196,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 198,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 200,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 202,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "portal",
+      "portalType": "gravity",
+      "x": 204,
+      "y": 9,
+      "width": 1,
+      "height": 3,
+      "targetGravity": -1
+    },
+    {
+      "type": "spike",
+      "x": 208,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 210,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 212,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 214,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 216,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 218,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 220,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "movingPlatform",
+      "x": 218,
+      "y": 12,
+      "width": 2,
+      "height": 0.5,
+      "axis": "x",
+      "distance": 3,
+      "speed": 68,
+      "color": "#89ffb0"
+    },
+    {
+      "type": "portal",
+      "portalType": "gravity",
+      "x": 222,
+      "y": 6,
+      "width": 1,
+      "height": 3,
+      "targetGravity": 1
+    },
+    {
+      "type": "portal",
+      "portalType": "speed",
+      "x": 236,
+      "y": 9,
+      "width": 1,
+      "height": 3,
+      "speedMultiplier": 1.78
+    },
+    {
+      "type": "spike",
+      "x": 246,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 248,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 250,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 252,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 254,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 256,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 258,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 260,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "jumpPad",
+      "x": 260,
+      "y": 12.75,
+      "width": 1,
+      "height": 0.25,
+      "power": 1.38,
+      "color": "#ffe57a"
+    },
+    {
+      "type": "portal",
+      "portalType": "gravity",
+      "x": 266,
+      "y": 9,
+      "width": 1,
+      "height": 3,
+      "targetGravity": -1
+    },
+    {
+      "type": "spike",
+      "x": 270,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 273,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 276,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 279,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "portal",
+      "portalType": "gravity",
+      "x": 280,
+      "y": 6,
+      "width": 1,
+      "height": 3,
+      "targetGravity": 1
+    },
+    {
+      "type": "spike",
+      "x": 284,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 286,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 288,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 290,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 294,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 296,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 298,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 300,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 302,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 304,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 306,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "portal",
+      "portalType": "speed",
+      "x": 306,
+      "y": 9,
+      "width": 1,
+      "height": 3,
+      "speedMultiplier": 1.68
+    },
+    {
+      "type": "block",
+      "x": 314,
+      "y": 10,
+      "width": 2,
+      "height": 1,
+      "color": "#355374"
+    },
+    {
+      "type": "block",
+      "x": 317,
+      "y": 9,
+      "width": 2,
+      "height": 1,
+      "color": "#355374"
+    },
+    {
+      "type": "jumpPad",
+      "x": 321,
+      "y": 12.75,
+      "width": 1,
+      "height": 0.25,
+      "power": 1.34,
+      "color": "#ffe57a"
+    },
+    {
+      "type": "portal",
+      "portalType": "gravity",
+      "x": 334,
+      "y": 9,
+      "width": 1,
+      "height": 3,
+      "targetGravity": -1
+    },
+    {
+      "type": "spike",
+      "x": 340,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 342,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 344,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 346,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 348,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 350,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 352,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "movingPlatform",
+      "x": 354,
+      "y": 12,
+      "width": 2,
+      "height": 0.5,
+      "axis": "y",
+      "distance": 2,
+      "speed": 86,
+      "color": "#9fe0ff"
+    },
+    {
+      "type": "portal",
+      "portalType": "gravity",
+      "x": 362,
+      "y": 6,
+      "width": 1,
+      "height": 3,
+      "targetGravity": 1
+    },
+    {
+      "type": "spike",
+      "x": 369,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 371,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 373,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 375,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 377,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 379,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 381,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 383,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "jumpPad",
+      "x": 381,
+      "y": 12.75,
+      "width": 1,
+      "height": 0.25,
+      "power": 1.35,
+      "color": "#ffe57a"
+    },
+    {
+      "type": "spike",
+      "x": 394,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 396,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 398,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 400,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 402,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 404,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "spike",
+      "x": 406,
+      "y": 12,
+      "width": 1,
+      "height": 1,
+      "direction": "up",
+      "color": "#ff6e96"
+    },
+    {
+      "type": "checkpoint",
+      "x": 406,
+      "y": 10.5,
+      "width": 0.4,
+      "height": 2,
+      "color": "#ffe57a"
+    },
+    {
+      "type": "jumpPad",
+      "x": 412,
+      "y": 12.75,
+      "width": 1,
+      "height": 0.25,
+      "power": 1.2,
+      "color": "#ffe57a"
+    },
+    {
+      "type": "spike",
+      "x": 420,
+      "y": 7,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 422,
+      "y": 7,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 424,
+      "y": 7,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "portal",
+      "portalType": "gravity",
+      "x": 432,
+      "y": 9,
+      "width": 1,
+      "height": 3,
+      "targetGravity": -1
+    },
+    {
+      "type": "spike",
+      "x": 438,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 441,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 444,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 447,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 450,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 453,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 456,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "spike",
+      "x": 459,
+      "y": 1,
+      "width": 1,
+      "height": 1,
+      "direction": "down",
+      "color": "#ff9fd4"
+    },
+    {
+      "type": "portal",
+      "portalType": "gravity",
+      "x": 446,
+      "y": 6,
+      "width": 1,
+      "height": 3,
+      "targetGravity": 1
+    },
+    {
+      "type": "movingPlatform",
+      "x": 444,
+      "y": 12,
+      "width": 2,
+      "height": 0.5,
+      "axis": "x",
+      "distance": 3,
+      "speed": 72,
+      "color": "#89ffb0"
+    },
+    {
+      "type": "portal",
+      "portalType": "speed",
+      "x": 450,
+      "y": 9,
+      "width": 1,
+      "height": 3,
+      "speedMultiplier": 1.5
+    }
+  ]
+}
